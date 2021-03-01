@@ -24,7 +24,7 @@ SECVAR_DEPEN = $(patsubst %,$(SECVARDEPDIR)/%, $(_SECVAR_DEPEN))
 DEPEN += $(SECVAR_DEPEN)
 
 SECVAROBJDIR = secvar
-_SECVAR_OBJ =  edk2-svc-validate.o edk2-svc-generate.o
+_SECVAR_OBJ =  edk2-svc-validate.o edk2-svc-generate.o util.o
 SECVAR_OBJ = $(patsubst %,$(SECVAROBJDIR)/%, $(_SECVAR_OBJ))
 
 _SKIBOOT_DEPEN =list.h config.h container_of.h check_type.h secvar.h opal-api.h endian.h short_types.h edk2.h edk2-compat-process.h

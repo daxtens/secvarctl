@@ -11,7 +11,6 @@
 #include "external/extraMbedtls/include/generate-pkcs7.h"
 #include "external/skiboot/include/edk2.h" //include last or else problems from pragma pack(1)
 
-
 #define variables  (char* []){ "PK", "KEK", "db", "dbx", "TS" }
 #define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
 #define uuid_equals(a,b) (!memcmp(a, b, UUID_SIZE))
@@ -33,6 +32,9 @@ static const struct hash_funct {
 int performValidation(int argc, char* argv[]); 
 int performGenerateCommand(int argc, char* argv[]);
 
+int printReadable(const char *c , size_t size, const char * key);
+
+
 int printCertInfo(mbedtls_x509_crt *x509);
 void printESLInfo(EFI_SIGNATURE_LIST *sigList);
 void printTimestamp(struct efi_time t);
@@ -44,8 +46,6 @@ size_t get_pkcs7_len(const struct efi_variable_authentication_2 *auth);
 int parseX509(mbedtls_x509_crt *x509, const unsigned char *certBuf, size_t buflen);
 const char* getSigType(const uuid_t);
 
-int getSecVar(struct secvar **var, const char* name, const char *fullPath);
-int updateVar(const char* path, const char* var, const unsigned char* buff, size_t size);
 int isVariable(const char *var);
 
 int validateAuth(const unsigned char *authBuf, size_t buflen, const char *key);

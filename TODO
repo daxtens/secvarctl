@@ -1,0 +1,3 @@
+- TS variable handling is currently in generic code and
+  really shouldn't be as it's not used on uefi.
+
