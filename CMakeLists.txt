@@ -40,6 +40,11 @@ list( TRANSFORM EXTRAMBEDTLSSRC PREPEND ${EXTRAMBEDTLSSRCDIR} )
 list( APPEND DEPEN ${EXTRAMBEDTLSDEP} )
 list( APPEND SRC ${EXTRAMBEDTLSSRC} )
 
+# include paths:
+#  - include/
+#  - the root directory so that we can e.g. #include "{external,backends}/..."
+include_directories(include .)
+
 add_executable( secvarctl ${SRC} )
 
 

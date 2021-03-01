@@ -6,8 +6,8 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>// for exit
-#include "../../include/secvarctl.h"
-#include "include/edk2-svc.h"// import last!!
+#include "secvarctl.h"
+#include "backends/edk2-compat/include/edk2-svc.h"// import last!!
 
 
 static void usage();
