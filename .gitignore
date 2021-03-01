@@ -1,3 +1,12 @@
 #Do not add these files to the commit
+# - backups and editor gunk
 *.swp
 *~
+# build products and coverage data
+*.o
+*.gcda
+*.gcno
+build
+# final binaries
+secvarctl
+secvarctl-cov
