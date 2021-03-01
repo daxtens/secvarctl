@@ -7,10 +7,16 @@
 #include "secvarctl.h"
 
 int verbose = PR_WARNING;
-static struct backend *getBackend();
+static const struct backend *getBackend();
 
-static struct backend backends [] = {
-	{ .name = "ibm,edk2-compat-v1", .countCmds = sizeof(edk2_compat_command_table) / sizeof(struct command), .commands = edk2_compat_command_table },
+static const struct backend powernv_backends [] = {
+	{ .name = "ibm,edk2-compat-v1", .countCmds = ARRAY_SIZE(edk2_compat_command_table), .commands = edk2_compat_command_table },
+};
+
+static const struct backend efivarfs_backend = {
+	.name = "efivarfs",
+	.countCmds = ARRAY_SIZE(efivarfs_command_table),
+	.commands = efivarfs_command_table
 };
 
 static struct command generic_commands[] = {
@@ -62,7 +68,7 @@ int main(int argc, char *argv[])
 {
 	int rc, i;
 	char *subcommand = NULL;
-	struct backend *backend = NULL;
+	const struct backend *backend = NULL;
 	
 	if (argc < 2) {
 		usage();
@@ -106,7 +112,7 @@ int main(int argc, char *argv[])
 	backend = getBackend();
 	if (!backend) { 
 		prlog(PR_WARNING, "WARNING: Unsupported backend detected, assuming ibm,edk2-compat-v1 backend\nRead/write may not work as expected\n");
-		backend = &backends[0];
+		backend = &powernv_backends[0];
 	}
 
 	for (i = 0; i < backend->countCmds; i++) {
@@ -123,18 +129,14 @@ int main(int argc, char *argv[])
 	return rc;
 }
 
-/*
- *Checks what backend the platform is running, CURRENTLY ONLY KNOWS EDK2
- *@return type of backend, or NULL if file could not be found or contained wrong contents,
- */
-static struct backend *getBackend()
+static const struct backend *getPowerNVBackend()
 {
 	char *buff = NULL, *secVarFormatLocation = "/sys/firmware/secvar/format";
 	size_t buffSize;
-	struct backend *result = NULL;
+	const struct backend *result = NULL;
 	// if file doesnt exist then print warning and keep going
 	if (isFile(secVarFormatLocation)) {
-		prlog(PR_WARNING, "WARNING!! Platform does not support secure variables\n");
+		prlog(PR_WARNING, "WARNING!! Platform does not support PowerNV secure variables\n");
 		goto out;
 	}
 	buff = getDataFromFile(secVarFormatLocation, &buffSize);
@@ -143,10 +145,10 @@ static struct backend *getBackend()
 		goto out;
 	}
 	//loop through all known backends
-	for (int i = 0; i < sizeof(backends) / sizeof(struct backend); i++) {
-		if (!strncmp(buff, backends[i].name, strlen(backends[i].name))) {
-			prlog(PR_NOTICE, "Found Backend %s\n", backends[i].name);
-			result = &backends[i];
+	for (int i = 0; i < ARRAY_SIZE(powernv_backends); i++) {
+		if (!strncmp(buff, powernv_backends[i].name, strlen(powernv_backends[i].name))) {
+			prlog(PR_NOTICE, "Found Backend %s\n", powernv_backends[i].name);
+			result = &powernv_backends[i];
 			goto out;
 		}
 	}
@@ -160,3 +162,15 @@ out:
 
 }
 
+/*
+ *Checks what backend the platform is running, CURRENTLY ONLY KNOWS EDK2
+ *@return type of backend, or NULL if file could not be found or contained wrong contents,
+ */
+static const struct backend *getBackend()
+{
+	// hack, I was too lazy to do better
+	if (isFile("/sys/firmware/efi/efivars/PK-8be4df61-93ca-11d2-aa0d-00e098032b8c") == SUCCESS)
+		return &efivarfs_backend;
+
+	return getPowerNVBackend();
+}

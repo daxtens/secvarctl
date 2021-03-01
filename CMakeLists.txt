@@ -32,6 +32,17 @@ list( TRANSFORM EDK2SRC PREPEND ${EDK2SRCDIR} )
 list( APPEND DEPEN ${EDK2DEPEN} )
 list( APPEND SRC ${EDK2SRC} )
 
+#sources/dependencies for efivarfs backend
+set( EVFSDEPEN efivarfs.h )
+set( EVFSDEPDIR backends/efivarfs/include/ )
+list( TRANSFORM EVFSDEPEN PREPEND ${EVFSDEPDIR} )
+set ( EVFSSRC efivarfs-read.c )
+set ( EVFSSRCDIR backends/efivarfs/ )
+list( TRANSFORM EVFSSRC PREPEND ${EVFSSRCDIR} )
+list( APPEND DEPEN ${EVFSDEPEN} )
+list( APPEND SRC ${EVFSSRC} )
+
+
 #sources/dependencies for borrowed skiboot code
 set( SKIBOOTDEPEN list.h config.h container_of.h check_type.h secvar.h opal-api.h endian.h short_types.h edk2.h edk2-compat-process.h )
 set( SKIBOOTDEPDIR external/skiboot/include/ )

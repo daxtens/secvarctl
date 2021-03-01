@@ -6,6 +6,7 @@
 #include "err.h"
 #include "prlog.h"
 #include "backends/powernv/include/edk2-svc.h"
+#include "backends/efivarfs/include/efivarfs.h"
 #include "secvar/include/edk2-svc.h"
 
 
