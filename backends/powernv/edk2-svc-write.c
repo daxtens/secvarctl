@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdlib.h>// for exit
 #include "secvarctl.h"
-#include "backends/edk2-compat/include/edk2-svc.h"// import last!!
+#include "backends/powernv/include/edk2-svc.h"// import last!!
 
 
 static void usage();

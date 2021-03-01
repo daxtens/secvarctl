@@ -12,10 +12,10 @@ set( SRC secvarctl.c generic.c )
 
 #sources/dependencies for edk2 backend
 set( EDK2DEPEN edk2-svc.h )
-set( EDK2DEPDIR backends/edk2-compat/include/ )
+set( EDK2DEPDIR backends/powernv/include/ )
 list( TRANSFORM EDK2DEPEN PREPEND ${EDK2DEPDIR} )
 set ( EDK2SRC edk2-svc-read.c edk2-svc-write.c edk2-svc-validate.c edk2-svc-verify.c edk2-svc-generate.c )
-set ( EDK2SRCDIR backends/edk2-compat/ )
+set ( EDK2SRCDIR backends/powernv/ )
 list( TRANSFORM EDK2SRC PREPEND ${EDK2SRCDIR} )
 list( APPEND DEPEN ${EDK2DEPEN} )
 list( APPEND SRC ${EDK2SRC} )
