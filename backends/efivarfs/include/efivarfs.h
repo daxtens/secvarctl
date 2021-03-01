@@ -10,10 +10,6 @@
 #define SECVARPATH "/sys/firmware/efi/efivars/"
 #endif
 
-int efivarfsReadCommand(int argc, char *argv[]);
-int efivarfsVerificationCommand(int argc, char *argv[]); 
-
 int getEVFSSecVar(struct secvar **var, const char* name, const char *fullPath);
 
-extern struct command efivarfs_command_table[1];
 #endif

@@ -2,7 +2,7 @@
 # Copyright 2021 IBM Corp.
 #_*_MakeFile_*_
 CC = gcc 
-_CFLAGS = -s -O2 -std=gnu99 -I./ -Iinclude/ -Wall -Werror
+_CFLAGS = -s -O2 -std=gnu99 -I./ -Iinclude/ -Wall -Werror -g
 LFLAGS = -lmbedtls -lmbedx509 -lmbedcrypto
 
 _DEPEN = secvarctl.h prlog.h err.h generic.h 
@@ -54,7 +54,7 @@ EXTRAMBEDTLSDIR = external/extraMbedtls
 _EXTRAMBEDTLS = generate-pkcs7.o pkcs7.o 
 EXTRAMBEDTLS = $(patsubst %,$(EXTRAMBEDTLSDIR)/%, $(_EXTRAMBEDTLS))
 
-OBJ =secvarctl.o  generic.o 
+OBJ =secvarctl.o  generic.o commands.o backends/backends.o
 OBJ +=$(SKIBOOT_OBJ) $(EXTRAMBEDTLS) $(EDK2_OBJ) $(EVFS_OBJ) $(SECVAR_OBJ)
 
 OBJCOV = $(patsubst %.o, %.cov.o,$(OBJ))

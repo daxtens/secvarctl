@@ -11,18 +11,12 @@
 #include <stdlib.h>
 #include "external/skiboot/include/secvar.h" // for secvar struct
 #include "backends/efivarfs/include/efivarfs.h"
+#include "backends/include/backends.h"
 
-static int readFiles(const char* var, const char* file, int hrFlag, const  char* path);
 static void usage();
 static void help();
 static int readFileFromSecVar(const char * path, const char *variable, int hrFlag);
 static int readFileFromPath(const char *path, int hrFlag);
-
-struct Arguments {
-	int helpFlag, printRaw;
-	const char *pathToSecVars, *varName, *inFile;
-}; 
-static int parseArgs(int argc, char *argv[], struct Arguments *args);
 
 static struct translation_table {
 	char *from;
@@ -33,152 +27,6 @@ static struct translation_table {
 	{ .from = "dbx", .to = "dbx-d719b2cb-3d3a-4596-a3bc-dad00e67656f" },
 	{ .from = "KEK", .to = "KEK-8be4df61-93ca-11d2-aa0d-00e098032b8c" },
 };
-
-/*
- *called from main()
- *handles argument parsing for read command
- *@param argc, number of argument
- *@param arv, array of params
- *@return SUCCESS or err number 
- */
-int efivarfsReadCommand(int argc, char* argv[]) 
-{
-	int rc;
-	struct Arguments args = {	
-		.helpFlag = 0, .printRaw = 0, 
-		.pathToSecVars = NULL, .inFile = NULL, .varName = NULL
-	};
-
-	rc = parseArgs(argc, argv, &args);
-	if (rc || args.helpFlag)
-		return rc;
-
-	rc = readFiles(args.varName, args.inFile, !args.printRaw, args.pathToSecVars);
-
-	return rc;	
-}
-
-/**
- *@param argv , array of command line arguments
- *@param argc, length of argv
- *@param args, struct that will be filled with data from argv
- *@return success or errno
- */
-static int parseArgs( int argc, char *argv[], struct Arguments *args) {
-	int rc = SUCCESS;
-	for (int i = 0; i < argc; i++) {
-		if (argv[i][0] != '-') {
-			args->varName = argv[i];
-			rc = isVariable(args->varName);
-			if (rc) {
-				prlog(PR_ERR, "ERROR: Invalid variable name %s\n", args->varName);
-				goto out;
-			}
-			continue;
-		}
-		if (!strcmp(argv[i], "--usage")) {
-			usage();
-			args->helpFlag = 1;
-			goto out;
-		}
-		else if (!strcmp(argv[i], "--help")) {
-			help();
-			args->helpFlag = 1;
-			goto out;
-		}
-		switch (argv[i][1]) {
-			case 'v':
-				verbose = PR_DEBUG;
-				break;
-			//set path
-			case 'p':
-				if (i + 1 >= argc || argv[i + 1][0] == '-') {
-					prlog(PR_ERR, "ERROR: Incorrect value for '-p', see usage...\n");
-					rc = ARG_PARSE_FAIL;
-					goto out;
-				}
-				else {
-					i++;
-					args->pathToSecVars= argv[i];
-				}
-				break;
-			//set file path
-			case 'f':
-				if (i + 1 >= argc || argv[i + 1][0] == '-') {
-					prlog(PR_ERR, "ERROR: Incorrect value for file flag, use '-f <file>', see usage...\n");
-					rc = ARG_PARSE_FAIL;
-					goto out;
-				}
-				else {
-					i++;
-					args->inFile = argv[i];
-				}	
-				break;
-			case 'r':
-				args->printRaw = 1;
-				break;
-			default:
-				prlog(PR_ERR, "ERROR: Unknown argument: %s\n", argv[i]);
-				rc = ARG_PARSE_FAIL;
-				goto out;
-		}
-		
-	}
-		
-out:
-	if (rc) {
-		prlog(PR_ERR, "Failed during argument parsing\n");
-		usage();
-	}
-
-	return rc;
-}
-
-
-/**
- *Function that recieves arguments to read command and handles getting data, finding paths, iterating through variables to read
- *@param var  string to variable wanted if <variable> option is given, NULL if not
- *@param file string to filename with path if -f option, NULL if not
- *@param hrFLag 1 if -hr for human readable output, 0 for raw data
- *@param path string to path where {PK,KEK,db,dbx,TS} subdirectories are, default SECVARPATH if none given
- *@return succcess if at least one file was successfully read
- */
-static int readFiles(const char* var, const char* file, int hrFlag, const char *path) 
-{  
-	// program is successful if at least one var was able to be read
-	int rc, successCount = 0;
-
-	if (file) prlog(PR_NOTICE, "Looking in file %s for ESL's\n", file); 
-	else prlog(PR_NOTICE, "Looking in %s for %s variable with %s format\n", path ? path : SECVARPATH, var ? var : "ALL", hrFlag ? "ASCII" : "raw_data");
-	
-	// set default path if no path chosen
-	if (!path) { 
-		path = SECVARPATH;
-	}
-
-	if (!file) {
-		for (int i = 0; i < ARRAY_SIZE(variables); i++) {
-			// if var is defined and it is not the current one then skip
-			if (var && strcmp(var, variables[i]) != 0) {	
-				continue;
-			}
-			printf("READING %s :\n", variables[i]);
-			rc = readFileFromSecVar(path, variables[i], hrFlag);
-			if (rc == SUCCESS) successCount++;
-		}
-	}
-	else {
-		rc = readFileFromPath(file, hrFlag);
-		if (rc == SUCCESS) successCount++;
-	} 
-	// if no good files read then count it as a failure
-	if (successCount < 1) {
-		prlog(PR_ERR, "No valid files to print, returning failure\n");
-		return INVALID_FILE;
-	}
-
-	return SUCCESS;
-}
 
 /**
  *Does the appropriate read command depending on hrFlag on the file <path>/<var>/data
@@ -358,7 +206,15 @@ static void usage()
 		"\t\t\t\t\tNOTE does not work when -f option is present\n\n");
 }
 
-struct command efivarfs_command_table[1] = {
-	{ .name = "read", .func = efivarfsReadCommand },
-	//{ .name = "verify", .func = efivarfsVerificationCommand },
+static const char * evfs_variables[] = { "PK", "KEK", "db", "dbx" };
+
+const struct secvarctl_backend efivarfs_backend = {
+	.name = "efivarfs",
+	.default_secvar_path = SECVARPATH,
+	.sb_variables = evfs_variables,
+	.sb_var_count = 4,
+	.read_help = help,
+	.read_usage = usage,
+	.readFileFromPath = readFileFromPath,
+	.readFileFromSecVar = readFileFromSecVar,
 };

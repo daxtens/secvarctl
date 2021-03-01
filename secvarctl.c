@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "prlog.h"
 #include "secvarctl.h"
+#include "backends/include/backends.h"
 
 int verbose = PR_WARNING;
 static const struct backend *getBackend();
@@ -13,17 +14,12 @@ static const struct backend powernv_backends [] = {
 	{ .name = "ibm,edk2-compat-v1", .countCmds = ARRAY_SIZE(edk2_compat_command_table), .commands = edk2_compat_command_table },
 };
 
-static const struct backend efivarfs_backend = {
-	.name = "efivarfs",
-	.countCmds = ARRAY_SIZE(efivarfs_command_table),
-	.commands = efivarfs_command_table
-};
-
 static struct command generic_commands[] = {
 #ifndef NO_CRYPTO
 	{ .name = "generate", .func = performGenerateCommand },
 #endif
 	{ .name = "validate", .func = performValidation },
+	{ .name = "read", .func = readCommand },
 };
 
 
@@ -99,20 +95,21 @@ int main(int argc, char *argv[])
 	argv++;
 	argc--;
 
-	// first try the generic commands, then try a backend
-	rc = UNKNOWN_COMMAND;
-	for (i = 0; i < ARRAY_SIZE(generic_commands); i++) {
-		if (!strncmp(subcommand, generic_commands[i].name, 32)) {
-			rc = generic_commands[i].func(argc, argv);
-			break;
-		}
-	}
-
 	// if backend is not edk2-compat print continuing despite some funtionality not working 
 	backend = getBackend();
 	if (!backend) { 
 		prlog(PR_WARNING, "WARNING: Unsupported backend detected, assuming ibm,edk2-compat-v1 backend\nRead/write may not work as expected\n");
 		backend = &powernv_backends[0];
+	}
+
+
+	// first try the generic commands, then try a backend
+	rc = UNKNOWN_COMMAND;
+	for (i = 0; i < ARRAY_SIZE(generic_commands); i++) {
+		if (!strncmp(subcommand, generic_commands[i].name, 32)) {
+			rc = generic_commands[i].func(argc, argv);
+			goto out;
+		}
 	}
 
 	for (i = 0; i < backend->countCmds; i++) {
@@ -121,6 +118,8 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
+
+out:
 	if (rc == UNKNOWN_COMMAND) {
 		prlog(PR_ERR, "ERROR:Unknown command %s\n", subcommand);
 		usage();
@@ -169,8 +168,10 @@ out:
 static const struct backend *getBackend()
 {
 	// hack, I was too lazy to do better
-	if (isFile("/sys/firmware/efi/efivars/PK-8be4df61-93ca-11d2-aa0d-00e098032b8c") == SUCCESS)
-		return &efivarfs_backend;
+	if (isFile("/sys/firmware/efi/efivars/PK-8be4df61-93ca-11d2-aa0d-00e098032b8c") == SUCCESS) {
+		secvarctl_backend = &efivarfs_backend;
+		return NULL;
+	}
 
 	return getPowerNVBackend();
 }
