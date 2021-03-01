@@ -14,6 +14,19 @@ EDK2DEPDIR = backends/powernv/include
 EDK2_DEPEN = $(patsubst %,$(EDK2DEPDIR)/%, $(_EDK2_DEPEN))
 DEPEN += $(EDK2_DEPEN)
 
+EDK2OBJDIR = backends/powernv
+_EDK2_OBJ =  edk2-svc-read.o edk2-svc-write.o edk2-svc-verify.o
+EDK2_OBJ = $(patsubst %,$(EDK2OBJDIR)/%, $(_EDK2_OBJ))
+
+_SECVAR_DEPEN = edk2-svc.h 
+SECVARDEPDIR = backends/powernv/include
+SECVAR_DEPEN = $(patsubst %,$(SECVARDEPDIR)/%, $(_SECVAR_DEPEN))
+DEPEN += $(SECVAR_DEPEN)
+
+SECVAROBJDIR = secvar
+_SECVAR_OBJ =  edk2-svc-validate.o edk2-svc-generate.o
+SECVAR_OBJ = $(patsubst %,$(SECVAROBJDIR)/%, $(_SECVAR_OBJ))
+
 _SKIBOOT_DEPEN =list.h config.h container_of.h check_type.h secvar.h opal-api.h endian.h short_types.h edk2.h edk2-compat-process.h
 SKIBOOTDEPDIR = external/skiboot/include
 SKIBOOT_DEPEN = $(patsubst %,$(SKIBOOTDEPDIR)/%, $(_SKIBOOT_DEPEN))
@@ -24,10 +37,6 @@ EXTRAMBEDTLSDEPDIR = external/extraMbedtls/include
 EXTRAMBEDTLSDEPEN = $(patsubst %,$(EXTRAMBEDTLSDEPDIR)/%, $(_EXTRAMBEDTLS_DEPEN))
 DEPEN += $(EXTRAMBEDTLSDEPEN)
 
-EDK2OBJDIR = backends/powernv
-_EDK2_OBJ =  edk2-svc-read.o edk2-svc-write.o edk2-svc-validate.o edk2-svc-verify.o edk2-svc-generate.o
-EDK2_OBJ = $(patsubst %,$(EDK2OBJDIR)/%, $(_EDK2_OBJ))
-
 SKIBOOTOBJDIR = external/skiboot/
 _SKIBOOT_OBJ = secvar_util.o edk2-compat.o edk2-compat-process.o
 SKIBOOT_OBJ = $(patsubst %,$(SKIBOOTOBJDIR)/%, $(_SKIBOOT_OBJ))
@@ -37,7 +46,7 @@ _EXTRAMBEDTLS = generate-pkcs7.o pkcs7.o
 EXTRAMBEDTLS = $(patsubst %,$(EXTRAMBEDTLSDIR)/%, $(_EXTRAMBEDTLS))
 
 OBJ =secvarctl.o  generic.o 
-OBJ +=$(SKIBOOT_OBJ) $(EXTRAMBEDTLS) $(EDK2_OBJ)
+OBJ +=$(SKIBOOT_OBJ) $(EXTRAMBEDTLS) $(EDK2_OBJ) $(SECVAR_OBJ)
 
 OBJCOV = $(patsubst %.o, %.cov.o,$(OBJ))
 

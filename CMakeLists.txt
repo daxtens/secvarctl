@@ -10,11 +10,23 @@ set( DEPDIR include/ )
 list( TRANSFORM DEPEN PREPEND ${DEPDIR} )
 set( SRC secvarctl.c generic.c )
 
+# for generic edk2-inspired secvar operations
+# - things that don't touch the in-firmware variables themselves
+set( SECVARDEPEN edk2-svc.h )
+set( SECVARDEPDIR backends/powernv/include/ )
+list( TRANSFORM SECVARDEPEN PREPEND ${SECVARDEPDIR} )
+set ( SECVARSRC edk2-svc-validate.c edk2-svc-generate.c )
+set ( SECVARSRCDIR secvar/ )
+list( TRANSFORM SECVARSRC PREPEND ${SECVARSRCDIR} )
+list( APPEND DEPEN ${SECVARDEPEN} )
+list( APPEND SRC ${SECVARSRC} )
+
+
 #sources/dependencies for edk2 backend
 set( EDK2DEPEN edk2-svc.h )
 set( EDK2DEPDIR backends/powernv/include/ )
 list( TRANSFORM EDK2DEPEN PREPEND ${EDK2DEPDIR} )
-set ( EDK2SRC edk2-svc-read.c edk2-svc-write.c edk2-svc-validate.c edk2-svc-verify.c edk2-svc-generate.c )
+set ( EDK2SRC edk2-svc-read.c edk2-svc-write.c edk2-svc-verify.c )
 set ( EDK2SRCDIR backends/powernv/ )
 list( TRANSFORM EDK2SRC PREPEND ${EDK2SRCDIR} )
 list( APPEND DEPEN ${EDK2DEPEN} )
