@@ -645,9 +645,5 @@ static int getSizeFromSizeFile(size_t *returnSize, const char* path)
 struct command edk2_compat_command_table[] = {
 	{ .name = "read", .func = performReadCommand },
 	{ .name = "write", .func = performWriteCommand },
-	{ .name = "validate", .func = performValidation },
 	{ .name = "verify", .func = performVerificationCommand },
-#ifndef NO_CRYPTO
-	{ .name = "generate", .func = performGenerateCommand }
-#endif
 };

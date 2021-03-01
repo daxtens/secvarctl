@@ -13,6 +13,14 @@ static struct backend backends [] = {
 	{ .name = "ibm,edk2-compat-v1", .countCmds = sizeof(edk2_compat_command_table) / sizeof(struct command), .commands = edk2_compat_command_table },
 };
 
+static struct command generic_commands[] = {
+#ifndef NO_CRYPTO
+	{ .name = "generate", .func = performGenerateCommand },
+#endif
+	{ .name = "validate", .func = performValidation },
+};
+
+
 void usage() 
 {
 	printf("USAGE: \n\t$ secvarctl [COMMAND]\n"
@@ -80,6 +88,20 @@ int main(int argc, char *argv[])
 		return ARG_PARSE_FAIL;
 	} 
 
+	// next command should be one of main subcommands
+	subcommand = *argv; 
+	argv++;
+	argc--;
+
+	// first try the generic commands, then try a backend
+	rc = UNKNOWN_COMMAND;
+	for (i = 0; i < ARRAY_SIZE(generic_commands); i++) {
+		if (!strncmp(subcommand, generic_commands[i].name, 32)) {
+			rc = generic_commands[i].func(argc, argv);
+			break;
+		}
+	}
+
 	// if backend is not edk2-compat print continuing despite some funtionality not working 
 	backend = getBackend();
 	if (!backend) { 
@@ -87,12 +109,6 @@ int main(int argc, char *argv[])
 		backend = &backends[0];
 	}
 
-	// next command should be one of main subcommands
-	subcommand = *argv; 
-	argv++;
-	argc--;
-
-	rc = UNKNOWN_COMMAND;
 	for (i = 0; i < backend->countCmds; i++) {
 		if (!strncmp(subcommand, backend->commands[i].name, 32)) {
 			rc = backend->commands[i].func(argc, argv);

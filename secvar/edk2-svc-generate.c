@@ -9,7 +9,7 @@
 #include <mbedtls/md.h>     /* generic interface */
 #include <mbedtls/platform.h> /*mbedtls functions*/
 #include "external/extraMbedtls/include/pkcs7.h" // for PKCS7 OID
-#include "backends/powernv/include/edk2-svc.h"
+#include "secvar/include/edk2-svc.h"
 #include "external/libstb-secvar/include/libstb-secvar.h"
 
 

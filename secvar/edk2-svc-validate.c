@@ -5,7 +5,9 @@
 #include <stdlib.h>// for exit
 #include <mbedtls/pk_internal.h> // for validating cert pk data
 #include "external/extraMbedtls/include/pkcs7.h"
-#include "backends/powernv/include/edk2-svc.h"// import last!!
+#include "secvar/include/edk2-svc.h"// import last!!
+
+#define CERT_BUFFER_SIZE 2048
 
 struct Arguments {
 	int helpFlag;
