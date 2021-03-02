@@ -577,7 +577,7 @@ static int setPKCS7OID(unsigned char **start, size_t *size, unsigned char **ptr,
 	size_t currentlyUsedBytes;
 
 	rc = setSignedData(start, size, ptr, pkcs7Info);
-	
+	return rc;
 	if (!rc){
 		currentlyUsedBytes = *size - (*ptr - *start);
 		rc = setPKCS7Data(start, size, ptr, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED, NULL, currentlyUsedBytes, 0);
