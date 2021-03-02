@@ -54,7 +54,13 @@ typedef struct {
 #define EFI_IMAGE_SECURITY_DATABASE_GUID (uuid_t){{0xcb, 0xb2, 0x19, 0xd7, 0x3a, 0x3d, 0x96, 0x45, \
              0xa3, 0xbc, 0xda, 0xd0, 0x0e, 0x67, 0x65, 0x6f}}
 
-#define SECVAR_ATTRIBUTES 39
+// dja for TianoCore - was 39 (0x27) = TBAWA | RUNTIME | BOOTSEVICE | NON_VOLATILE
+//#define SECVAR_ATTRIBUTES 39
+#define SECVAR_ATTRIBUTES (EFI_VARIABLE_APPEND_WRITE | \
+			   EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS | \
+			   EFI_VARIABLE_RUNTIME_ACCESS | \
+			   EFI_VARIABLE_BOOTSERVICE_ACCESS | \
+			   EFI_VARIABLE_NON_VOLATILE)
 
 #define EFI_CERT_RSA2048_GUID (uuid_t) {{0xe8,0x66,0x57, 0x3c, 0x9c, 0x26,0x34,  0x4e,  0xaa, 0x14, 0xed, 0x77, 0x6e, 0x85, 0xb3, 0xb6}} //ADDED BY NICK CHILD
 ///
