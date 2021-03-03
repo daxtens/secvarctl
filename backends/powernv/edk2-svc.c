@@ -16,4 +16,8 @@ const struct secvarctl_backend edk2_backend = {
 	.read_usage = edk2_read_usage,
 	.readFileFromPath = edk2_readFileFromPath,
 	.readFileFromSecVar = edk2_readFileFromSecVar,
+	.write_help = edk2_write_help,
+	.write_usage = edk2_write_usage,
+	.updateSecVar = edk2_updateSecVar,
+
 };

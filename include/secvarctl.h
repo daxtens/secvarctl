@@ -24,6 +24,7 @@ struct backend {
 extern int verbose;
 
 int readCommand(int argc, char* argv[]);
+int performWriteCommand(int argc, char* argv[]);
 
 
 #endif

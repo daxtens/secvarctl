@@ -24,6 +24,7 @@ static struct command generic_commands[] = {
 #endif
 	{ .name = "validate", .func = performValidation },
 	{ .name = "read", .func = readCommand },
+	{ .name = "write", .func = performWriteCommand },
 };
 
 

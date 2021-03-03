@@ -28,6 +28,10 @@ void evfs_read_usage();
 void evfs_read_help();
 int evfs_readFileFromSecVar(const char * path, const char *variable, int hrFlag);
 int evfs_readFileFromPath(const char *path, int hrFlag);
+void evfs_write_usage();
+void evfs_write_help();
+int evfs_updateSecVar(const char *var, const char *authFile, const char *path, int force);
+int evfs_updateVar(const char *path, const char *var, const unsigned char *buff, size_t size);
 
 
 #endif

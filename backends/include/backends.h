@@ -11,14 +11,19 @@ struct secvarctl_backend {
 
 	// read name from file
 	int (*readFileFromPath) (const char *file, int hrFlag);
-
 	// read name from var dir
 	int (*readFileFromSecVar) (const char *path, const char *variable, int hrFlag);
-	
 	// read usage
 	void (*read_usage) (void);
 	// read help
 	void (*read_help) (void);
+
+	// write
+	int (*updateSecVar) (const char *varName, const char *authFile, const char *path, int force);
+	// write usage
+	void (*write_usage) (void);
+	// write help
+	void (*write_help) (void);
 };
 
 extern const struct secvarctl_backend efivarfs_backend;

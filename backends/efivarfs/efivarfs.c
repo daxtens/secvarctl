@@ -15,10 +15,15 @@ const struct secvarctl_backend efivarfs_backend = {
 	.default_secvar_path = SECVARPATH,
 	.sb_variables = evfs_variables,
 	.sb_var_count = 4,
-	.read_help = evfs_read_help,
-	.read_usage = evfs_read_usage,
-	.readFileFromPath = evfs_readFileFromPath,
-	.readFileFromSecVar = evfs_readFileFromSecVar,
 	.quirks = QUIRK_TIME_MINUS_1900 | QUIRK_PKCS2_SIGNEDDATA_ONLY,
 	.default_attributes = EVFS_SECVAR_ATTRIBUTES,
+
+	.readFileFromPath = evfs_readFileFromPath,
+	.readFileFromSecVar = evfs_readFileFromSecVar,
+	.read_help = evfs_read_help,
+	.read_usage = evfs_read_usage,
+
+	.updateSecVar = evfs_updateSecVar,
+	.write_help = evfs_write_help,
+	.write_usage = evfs_write_usage,
 };

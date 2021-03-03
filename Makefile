@@ -24,7 +24,7 @@ EVFS_DEPEN = $(patsubst %,$(EVFSDEPDIR)/%, $(_EVFS_DEPEN))
 DEPEN += $(EVFS_DEPEN)
 
 EVFSOBJDIR = backends/efivarfs
-_EVFS_OBJ =  efivarfs.o efivarfs-read.o
+_EVFS_OBJ =  efivarfs.o efivarfs-read.o efivarfs-write.o
 EVFS_OBJ = $(patsubst %,$(EVFSOBJDIR)/%, $(_EVFS_OBJ))
 
 _SECVAR_DEPEN = edk2-svc.h 
