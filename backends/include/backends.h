@@ -1,8 +1,12 @@
+#define QUIRK_TIME_MINUS_1900 0x1
+
 struct secvarctl_backend {
 	const char * name;
 	const char * default_secvar_path;
 	const char ** sb_variables;
 	const int sb_var_count;
+	unsigned long long quirks;
+	unsigned long default_attributes;
 
 	// read name from file
 	int (*readFileFromPath) (const char *file, int hrFlag);

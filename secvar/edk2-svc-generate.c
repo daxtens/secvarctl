@@ -11,7 +11,7 @@
 #include "external/extraMbedtls/include/pkcs7.h" // for PKCS7 OID
 #include "secvar/include/edk2-svc.h"
 #include "external/libstb-secvar/include/libstb-secvar.h"
-
+#include "backends/include/backends.h"
 
 
 
@@ -391,6 +391,9 @@ static int parseArgs( int argc, char *argv[], struct Arguments *args) {
 					}		
 					else {
 						rc = validateTime(args->time);
+						// todo: refactor the two ways time can be set (and validateTime called) into 1 path
+						if (secvarctl_backend->quirks & QUIRK_TIME_MINUS_1900)
+							args->time->year -= 1900;
 						if (rc) goto out;
 					}
 				}
@@ -853,6 +856,7 @@ static int getHashFunction(const char* name, struct hash_funct **returnFunct)
 static int getTimestamp(struct efi_time *ts) {
 	time_t epochTime;
 	struct tm *t;
+	int rc;
 
 	time(&epochTime);	
 	t = localtime(&epochTime);
@@ -863,7 +867,11 @@ static int getTimestamp(struct efi_time *ts) {
    	ts->minute = t->tm_min;
   	ts->second = t->tm_sec;
 
-  	return validateTime(ts);	
+	rc = validateTime(ts);
+	// todo: refactor the two ways time can be set (and validateTime called) into 1 path
+	if (secvarctl_backend->quirks & QUIRK_TIME_MINUS_1900)
+		ts->year -= 1900;
+	return rc;
 }
 
 /*
@@ -941,7 +949,7 @@ static int getPreHashForSecVar(unsigned char **outData, size_t *outSize, const u
     unsigned char *ptr = NULL;
     char *wkey = NULL;
     size_t varlen;
-    le32 attr = cpu_to_le32(SECVAR_ATTRIBUTES);
+    le32 attr = cpu_to_le32(secvarctl_backend->default_attributes);
     uuid_t guid;
 
     if (!args->varName) {

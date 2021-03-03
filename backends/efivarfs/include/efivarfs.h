@@ -10,6 +10,13 @@
 #define SECVARPATH "/sys/firmware/efi/efivars/"
 #endif
 
+#define EVFS_SECVAR_ATTRIBUTES (EFI_VARIABLE_APPEND_WRITE | \
+			   EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS | \
+			   EFI_VARIABLE_RUNTIME_ACCESS | \
+			   EFI_VARIABLE_BOOTSERVICE_ACCESS | \
+			   EFI_VARIABLE_NON_VOLATILE)
+
+
 int getEVFSSecVar(struct secvar **var, const char* name, const char *fullPath);
 
 #endif
