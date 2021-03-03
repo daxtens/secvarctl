@@ -1,14 +1,10 @@
 #include "backends/include/backends.h"
 #include "include/edk2-svc.h"
 
-struct command edk2_compat_command_table[] = {
-	{ .name = "verify", .func = performVerificationCommand },
-};
-
 static const char * edk2_variables[] = {"PK", "KEK", "db", "dbx", "TS"};
 
 const struct secvarctl_backend edk2_backend = {
-	.name = "edk2-compat",
+	.name = "ibm,edk2-compat-v1",
 	.default_secvar_path = SECVARPATH,
 	.sb_variables = edk2_variables,
 	.sb_var_count = 5,
@@ -19,5 +15,7 @@ const struct secvarctl_backend edk2_backend = {
 	.write_help = edk2_write_help,
 	.write_usage = edk2_write_usage,
 	.updateSecVar = edk2_updateSecVar,
-
+	.verify_help = edk2_verify_help,
+	.verify_usage = edk2_write_usage,
+	.verify = edk2_verify,
 };

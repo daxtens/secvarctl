@@ -24,6 +24,14 @@ struct secvarctl_backend {
 	void (*write_usage) (void);
 	// write help
 	void (*write_help) (void);
+
+	// verify
+	int (*verify) (char * currentVars[], int currCount, const char *updateVars[], int updateCount, const char *path, int writeFlag);
+	// verify usage
+	void (*verify_usage) (void);
+	// verify help
+	void (*verify_help) (void);
+
 };
 
 extern const struct secvarctl_backend efivarfs_backend;

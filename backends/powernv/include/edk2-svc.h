@@ -10,9 +10,6 @@
 #define SECVARPATH "/sys/firmware/secvar/vars/"
 #endif
 
-int performReadCommand(int argc, char *argv[]);
-int performVerificationCommand(int argc, char *argv[]); 
-
 int getSecVar(struct secvar **var, const char* name, const char *fullPath);
 int updateVar(const char *path, const char *var, const unsigned char *buff, size_t size);
 
@@ -23,6 +20,8 @@ int edk2_readFileFromPath(const char *path, int hrFlag);
 void edk2_write_usage();
 void edk2_write_help();
 int edk2_updateSecVar(const char *var, const char *authFile, const char *path, int force);
+void edk2_verify_usage();
+void edk2_verify_help();
+int edk2_verify(char **currentVars, int currCount, const char **updateVars, int updateCount, const char *path, int writeFlag);
 
-extern struct command edk2_compat_command_table[1];
 #endif

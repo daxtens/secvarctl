@@ -15,16 +15,12 @@ enum backends {
 	EDK2_COMPAT
 };
 
-struct backend {
-	char name[32];
-	size_t countCmds;
-	struct command *commands;
-};
-
 extern int verbose;
 
 int readCommand(int argc, char* argv[]);
 int performWriteCommand(int argc, char* argv[]);
+int performVerificationCommand(int argc, char* argv[]);
 
+int validateVarsArg(const char *vars[], int size);
 
 #endif
