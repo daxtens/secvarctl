@@ -15,7 +15,7 @@ EDK2_DEPEN = $(patsubst %,$(EDK2DEPDIR)/%, $(_EDK2_DEPEN))
 DEPEN += $(EDK2_DEPEN)
 
 EDK2OBJDIR = backends/powernv
-_EDK2_OBJ =  edk2-svc-read.o edk2-svc-write.o edk2-svc-verify.o
+_EDK2_OBJ =  edk2-svc.c edk2-svc-read.o edk2-svc-write.o edk2-svc-verify.o
 EDK2_OBJ = $(patsubst %,$(EDK2OBJDIR)/%, $(_EDK2_OBJ))
 
 _EVFS_DEPEN = efivarfs.h 

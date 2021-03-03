@@ -12,10 +12,15 @@
 
 int performReadCommand(int argc, char *argv[]);
 int performVerificationCommand(int argc, char *argv[]); 
-int performWriteCommand(int argc, char *argv[]);
 
 int getSecVar(struct secvar **var, const char* name, const char *fullPath);
 int updateVar(const char* path, const char* var, const unsigned char* buff, size_t size);
 
-extern struct command edk2_compat_command_table[3];
+void edk2_read_usage();
+void edk2_read_help();
+int edk2_readFileFromSecVar(const char * path, const char *variable, int hrFlag);
+int edk2_readFileFromPath(const char *path, int hrFlag);
+
+
+extern struct command edk2_compat_command_table[1];
 #endif

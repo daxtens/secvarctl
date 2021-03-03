@@ -13,10 +13,6 @@
 #include "backends/powernv/include/edk2-svc.h"// include last, pragma pack(1) issue
 #include "backends/include/backends.h"
 
-static void usage();
-static void help();
-static int readFileFromSecVar(const char * path, const char *variable, int hrFlag);
-static int readFileFromPath(const char *path, int hrFlag);
 static int getSizeFromSizeFile(size_t *returnSize, const char* path);
 static int readTS(const char *data, size_t size);
 
@@ -28,7 +24,7 @@ static int readTS(const char *data, size_t size);
  *@param hrFlag, 1 for human readable 0 for raw data
  *@return SUCCESS or error number
  */
-static int readFileFromSecVar(const char *path, const char *variable, int hrFlag)
+int edk2_readFileFromSecVar(const char *path, const char *variable, int hrFlag)
 {
 	int extra = 10, rc;
 	struct secvar *var = NULL;
@@ -81,7 +77,7 @@ out:
  *@param hrFlag, 1 for human readable 0 for raw data
  *@return SUCCESS or error number
  */
-static int readFileFromPath(const char *file, int hrFlag)
+int edk2_readFileFromPath(const char *file, int hrFlag)
 {
 	int rc;
 	size_t size = 0;
@@ -193,7 +189,7 @@ int getSecVar(struct secvar **var, const char* name, const char *fullPath){
 	return SUCCESS;
 }
 
-void help() 
+void edk2_read_help() 
 {
 	printf("HELP:\n\t"
 		"This program command is created to easily view secure variables. The current variables\n" 
@@ -201,10 +197,10 @@ void help()
 		"\tgiven, then the information for the keys in the default path will be printed."
 		"\n\tIf the user would like to print the information for another ESL file,\n"
 		"\tthen the '-f' command would be appropriate.\n");
-	usage();
+	edk2_read_usage();
 }
 
-void usage() 
+void edk2_read_usage() 
 {
 	printf("USAGE:\n\t' $ secvarctl read [OPTIONS] [VARIABLES] '\nOPTIONS:"
 		"\n\t--usage/--help"
@@ -293,22 +289,3 @@ static int getSizeFromSizeFile(size_t *returnSize, const char* path)
 
 	return rc;
 }
-
-
-struct command edk2_compat_command_table[] = {
-	{ .name = "write", .func = performWriteCommand },
-	{ .name = "verify", .func = performVerificationCommand },
-};
-
-static const char * edk2_variables[] = {"PK", "KEK", "db", "dbx", "TS"};
-
-const struct secvarctl_backend edk2_backend = {
-	.name = "edk2-compat",
-	.default_secvar_path = SECVARPATH,
-	.sb_variables = edk2_variables,
-	.sb_var_count = 5,
-	.read_help = help,
-	.read_usage = usage,
-	.readFileFromPath = readFileFromPath,
-	.readFileFromSecVar = readFileFromSecVar,
-};
