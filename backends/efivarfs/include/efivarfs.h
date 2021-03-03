@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 /* Copyright 2021 IBM Corp.*/
-#ifndef BACKENDS_UEFI_H
-#define BACKENDS_UEFI_H
+#ifndef BACKENDS_EFIVARFS_H
+#define BACKENDS_EFIVARFS_H
 #include "secvar/include/edk2-svc.h"
 
 #define CERT_BUFFER_SIZE        2048
@@ -11,12 +11,23 @@
 #endif
 
 #define EVFS_SECVAR_ATTRIBUTES (EFI_VARIABLE_APPEND_WRITE | \
-			   EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS | \
-			   EFI_VARIABLE_RUNTIME_ACCESS | \
-			   EFI_VARIABLE_BOOTSERVICE_ACCESS | \
-			   EFI_VARIABLE_NON_VOLATILE)
+				EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS | \
+				EFI_VARIABLE_RUNTIME_ACCESS | \
+				EFI_VARIABLE_BOOTSERVICE_ACCESS | \
+				EFI_VARIABLE_NON_VOLATILE)
 
+struct translation_table {
+	char *from;
+	char *to;
+};
+
+extern struct translation_table variable_renames[4];
 
 int getEVFSSecVar(struct secvar **var, const char* name, const char *fullPath);
+void evfs_read_usage();
+void evfs_read_help();
+int evfs_readFileFromSecVar(const char * path, const char *variable, int hrFlag);
+int evfs_readFileFromPath(const char *path, int hrFlag);
+
 
 #endif

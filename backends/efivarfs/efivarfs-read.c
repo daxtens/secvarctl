@@ -13,21 +13,6 @@
 #include "backends/efivarfs/include/efivarfs.h"
 #include "backends/include/backends.h"
 
-static void usage();
-static void help();
-static int readFileFromSecVar(const char * path, const char *variable, int hrFlag);
-static int readFileFromPath(const char *path, int hrFlag);
-
-static struct translation_table {
-	char *from;
-	char *to;
-} variable_renames[] = {
-	{ .from = "PK", .to = "PK-8be4df61-93ca-11d2-aa0d-00e098032b8c" },
-	{ .from = "db", .to = "db-d719b2cb-3d3a-4596-a3bc-dad00e67656f" },
-	{ .from = "dbx", .to = "dbx-d719b2cb-3d3a-4596-a3bc-dad00e67656f" },
-	{ .from = "KEK", .to = "KEK-8be4df61-93ca-11d2-aa0d-00e098032b8c" },
-};
-
 /**
  *Does the appropriate read command depending on hrFlag on the file <path>/<var>/data
  *@param path , the path to the file with ending '/'
@@ -35,7 +20,7 @@ static struct translation_table {
  *@param hrFlag, 1 for human readable 0 for raw data
  *@return SUCCESS or error number
  */
-static int readFileFromSecVar(const char *path, const char *variable, int hrFlag)
+int evfs_readFileFromSecVar(const char *path, const char *variable, int hrFlag)
 {
 	int rc, i;
 	struct secvar *var = NULL;
@@ -97,7 +82,7 @@ out:
  *@param hrFlag, 1 for human readable 0 for raw data
  *@return SUCCESS or error number
  */
-static int readFileFromPath(const char *file, int hrFlag)
+int evfs_readFileFromPath(const char *file, int hrFlag)
 {
 	int rc;
 	size_t size = 0;
@@ -183,7 +168,7 @@ int getEVFSSecVar(struct secvar **var, const char* name, const char *fullPath){
 	return SUCCESS;
 }
 
-static void help() 
+void evfs_read_help()
 {
 	printf("HELP:\n\t"
 		"This program command is created to easily view secure variables. The current variables\n" 
@@ -191,10 +176,10 @@ static void help()
 		"\tgiven, then the information for the keys in the default path will be printed."
 		"\n\tIf the user would like to print the information for another ESL file,\n"
 		"\tthen the '-f' command would be appropriate.\n");
-	usage();
+	evfs_read_usage();
 }
 
-static void usage() 
+void evfs_read_usage()
 {
 	printf("USAGE:\n\t' $ secvarctl read [OPTIONS] [VARIABLES] '\nOPTIONS:"
 		"\n\t--usage/--help"
@@ -205,18 +190,3 @@ static void usage()
 		"VARIABLES:\n\t{'PK','KEK','db','dbx'}\ttype one of the following to get info on that key,\n"
 		"\t\t\t\t\tNOTE does not work when -f option is present\n\n");
 }
-
-static const char * evfs_variables[] = { "PK", "KEK", "db", "dbx" };
-
-const struct secvarctl_backend efivarfs_backend = {
-	.name = "efivarfs",
-	.default_secvar_path = SECVARPATH,
-	.sb_variables = evfs_variables,
-	.sb_var_count = 4,
-	.read_help = help,
-	.read_usage = usage,
-	.readFileFromPath = readFileFromPath,
-	.readFileFromSecVar = readFileFromSecVar,
-	.quirks = QUIRK_TIME_MINUS_1900 | QUIRK_PKCS2_SIGNEDDATA_ONLY,
-	.default_attributes = EVFS_SECVAR_ATTRIBUTES,
-};
