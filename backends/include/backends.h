@@ -1,4 +1,5 @@
-#define QUIRK_TIME_MINUS_1900 0x1
+#define QUIRK_TIME_MINUS_1900		0x1
+#define QUIRK_PKCS2_SIGNEDDATA_ONLY	0x2
 
 struct secvarctl_backend {
 	const char * name;

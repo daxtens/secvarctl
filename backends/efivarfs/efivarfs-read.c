@@ -217,6 +217,6 @@ const struct secvarctl_backend efivarfs_backend = {
 	.read_usage = usage,
 	.readFileFromPath = readFileFromPath,
 	.readFileFromSecVar = readFileFromSecVar,
-	.quirks = QUIRK_TIME_MINUS_1900,
+	.quirks = QUIRK_TIME_MINUS_1900 | QUIRK_PKCS2_SIGNEDDATA_ONLY,
 	.default_attributes = EVFS_SECVAR_ATTRIBUTES,
 };

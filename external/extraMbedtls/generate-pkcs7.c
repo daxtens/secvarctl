@@ -19,6 +19,7 @@
 #include "generic.h"
 
 #include "external/skiboot/include/edk2-compat-process.h" //  work on factoring this out
+#include "backends/include/backends.h" // likewise
 
 extern int verbose;
 /* STRUCTURE OF PKCS7 AND CORRESPONDING FUNCTIONS THAT HANDLE THEM:
@@ -577,7 +578,11 @@ static int setPKCS7OID(unsigned char **start, size_t *size, unsigned char **ptr,
 	size_t currentlyUsedBytes;
 
 	rc = setSignedData(start, size, ptr, pkcs7Info);
-	return rc;
+
+	// the generation process should take this as an argument
+	if (secvarctl_backend->quirks & QUIRK_PKCS2_SIGNEDDATA_ONLY)
+		return rc;
+
 	if (!rc){
 		currentlyUsedBytes = *size - (*ptr - *start);
 		rc = setPKCS7Data(start, size, ptr, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED, NULL, currentlyUsedBytes, 0);
