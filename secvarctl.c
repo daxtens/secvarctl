@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include "prlog.h"
 #include "secvarctl.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "backends/include/backends.h"
 
 int verbose = PR_WARNING;
@@ -167,8 +171,14 @@ out:
  */
 static const struct backend *getBackend()
 {
-	// hack, I was too lazy to do better
-	if (isFile("/sys/firmware/efi/efivars/PK-8be4df61-93ca-11d2-aa0d-00e098032b8c") == SUCCESS) {
+	struct stat statbuf;
+	int rc;
+
+	// a hack, efivarfs can be anywhere.
+	// test for dir, not PK, as PK could be absent.
+	rc = stat("/sys/firmware/efi/efivars/", &statbuf);
+
+	if (rc == 0 && (statbuf.st_mode & S_IFMT) == S_IFDIR) {
 		secvarctl_backend = &efivarfs_backend;
 		return NULL;
 	}
